@@ -7,7 +7,7 @@ const onServerStarted = async (bp: typeof sdk) => {}
 
 // At this point, you would likely setup the API route of your module.
 const onServerReady = async (bp: typeof sdk) => {
-  
+
 }
 
 // Every time a bot is created (or enabled), this method will be called with the bot id
@@ -26,7 +26,7 @@ const onFlowChanged = async (bp: typeof sdk, botId: string, flow: sdk.Flow) => {
  * You can copy the content of any existing bot and mark them as "templates", so you can create multiple bots from the same template.
  */
 
-const botTemplates: sdk.BotTemplate[] = [{ id: 'my_bot_demo', name: 'Bot Demo', desc: 'Some description' }]
+const botTemplates: sdk.BotTemplate[] = []
 
 /**
  * Skills allows you to create custom logic and use them easily on the flow editor
@@ -44,7 +44,7 @@ const entryPoint: sdk.ModuleEntryPoint = {
   skills,
   definition: {
     // This must match the name of your module's folder, and the name in package.json
-    name: 'starter-module',
+    name: 'whatsapp-channel-botpress',
     /**
      * By default we are using the https://blueprintjs.com/docs/#icons. Use the corresponding name
      * Otherwise, create an icon in the assets module in the following format studio_${module.menuIcon}

@@ -1,16 +1,19 @@
 {
+  "extends": "../tsconfig.shared.json",
   "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["es2017"],
     "module": "commonjs",
-    "target": "es2021",
-    "rootDir": "src",
+    "baseUrl": "./",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "composite": true,
-    "strict": true
+    "types": ["node"],
+    "skipLibCheck": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "rootDirs": [
+      "src",
+    ],
   },
-  "include": ["src", "src/*.json", "botpress.d.ts"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["node_modules"]
 }

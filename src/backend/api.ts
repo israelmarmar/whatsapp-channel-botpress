@@ -3,12 +3,13 @@ import WhatsAppMessaging from './messaging'
 import _ from 'lodash'
 
 export default async (bp: typeof sdk, botId: string) => {
-  /**
-   * This is an example route to get you started.
-   * Your API will be available at `http://localhost:3000/api/v1/bots/BOT_NAME/mod/starter-module`
-   * Just replace BOT_NAME by your bot ID
-   */
-  const router = bp.http.createRouterForBot('whatsapp')
+  console.log("api montada")
+  
+  const msgClient = new WhatsAppMessaging(bp,botId)
+
+  const router = bp.http.createRouterForBot('whatsapp', {
+    checkAuthentication: false
+  })
 
   // Link to access this route: http://localhost:3000/api/v1/bots/BOT_NAME/mod/starter-module/my-first-route
   router.get('/hello', async (req: any, res: any) => {
@@ -16,7 +17,8 @@ export default async (bp: typeof sdk, botId: string) => {
   })
 
   router.post('/webhook', async (req: any, res: any) => {
-    res.sendStatus(200)
+    console.log(JSON.stringify(req.body))
+  
     // info on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
     if (req.body.object) {
       if (
@@ -30,12 +32,24 @@ export default async (bp: typeof sdk, botId: string) => {
         let phone_number_id = req.body.entry[0].changes[0].value.metadata.phone_number_id
         let from = req.body.entry[0].changes[0].value.messages[0].from // extract the phone number from the webhook payload
         let msg = req.body.entry[0].changes[0].value.messages[0]
-        let msg_body = msg.text.body // extract the message text from the webhook payload
         let timestamp = parseInt(req.body.entry[0].changes[0].value.messages[0].timestamp)
+        let id = req.body.entry[0].changes[0].value.messages[0].id
 
+        let msg_body;
+        switch(msg.type){
+          case "text":
+            msg_body = msg.text.body;
+            break;
+          case "interactive":
+            msg_body = msg.interactive.button_reply.title;
+          default:
+            break;
+        }
         const payload = {
           type: 'text',
-          text: msg_body
+          text: msg_body,
+          from,
+          phone_number_id
         }
 
         // bp.events.replyToEvent(eventDestination, [payload])
@@ -45,8 +59,7 @@ export default async (bp: typeof sdk, botId: string) => {
 
           console.log('phone_number_id ' + phone_number_id)
 
-          const msgClient = new WhatsAppMessaging(bp,botId,phone_number_id,from)
-
+          msgClient.setWid(from,phone_number_id)
           const attr = await msgClient.getUserAttributes()
 
           console.log(attr.lastMessage, msg)
@@ -54,12 +67,14 @@ export default async (bp: typeof sdk, botId: string) => {
           const timenow = Math.floor(Date.now() / 1000)
 
           //verificar se a mensagem recebida é igual ao da anterior
+          console.log(timenow - timestamp)
           if (!_.isEqual(attr.lastMessage, msg) && timenow - timestamp < 4) {
             await msgClient.setUserAttributes({ lastMessage: msg })
 
             console.log('usuario criado')
 
             await msgClient.sendMsgToBot(payload)
+            res.sendStatus(200)
           }
         } catch (e) {
           console.log(e)
@@ -73,7 +88,8 @@ export default async (bp: typeof sdk, botId: string) => {
   })
 
   router.get('/webhook', async (req: any, res: any) => {
-    const verify_token = process.env.VERIFY_TOKEN
+    console.log(req.query)
+    const verify_token = process.env.WHATSAPP_API_VERIFY_TOKEN
 
     // Parse params from the webhook verification request
     let mode = req.query['hub.mode']
@@ -93,5 +109,9 @@ export default async (bp: typeof sdk, botId: string) => {
             }
         }
     })
+
+  let apiUrl = await router.getPublicPath()
+  apiUrl = apiUrl.replace('BOT_ID', '___')
+  bp.logger.info(`Private API Path is ${apiUrl}`)
 
 }
