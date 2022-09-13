@@ -3,7 +3,6 @@ import WhatsAppMessaging from './messaging'
 import _ from 'lodash'
 
 export default async (bp: typeof sdk, botId: string) => {
-  console.log("api montada")
   
   const msgClient = new WhatsAppMessaging(bp,botId)
 
@@ -17,8 +16,6 @@ export default async (bp: typeof sdk, botId: string) => {
   })
 
   router.post('/webhook', async (req: any, res: any) => {
-    console.log(JSON.stringify(req.body))
-  
     // info on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
     if (req.body.object) {
       if (
@@ -53,31 +50,18 @@ export default async (bp: typeof sdk, botId: string) => {
         }
 
         // bp.events.replyToEvent(eventDestination, [payload])
-        console.log('começando')
 
         try {
-
-          console.log('phone_number_id ' + phone_number_id)
-
           msgClient.setWid(from,phone_number_id)
           const attr = await msgClient.getUserAttributes()
-
-          console.log(attr.lastMessage, msg)
-
           const timenow = Math.floor(Date.now() / 1000)
 
-          //verificar se a mensagem recebida é igual ao da anterior
-          console.log(timenow - timestamp)
           if (!_.isEqual(attr.lastMessage, msg) && timenow - timestamp < 4) {
             await msgClient.setUserAttributes({ lastMessage: msg })
-
-            console.log('usuario criado')
-
             await msgClient.sendMsgToBot(payload)
             res.sendStatus(200)
           }
         } catch (e) {
-          console.log(e)
           res.sendStatus(404)
         }
       }
@@ -88,8 +72,7 @@ export default async (bp: typeof sdk, botId: string) => {
   })
 
   router.get('/webhook', async (req: any, res: any) => {
-    console.log(req.query)
-    const verify_token = process.env.WHATSAPP_API_VERIFY_TOKEN
+    const verify_token = process.env[`WHATSAPP_API_TOKEN_${botId.replace("-","_")}`] || ""
 
     // Parse params from the webhook verification request
     let mode = req.query['hub.mode']
@@ -101,7 +84,6 @@ export default async (bp: typeof sdk, botId: string) => {
       // Check the mode and token sent are correct
             if (mode === 'subscribe' && token === verify_token) {
                 // Respond with 200 OK and challenge token from the request
-                console.log('WEBHOOK_VERIFIED')
                 res.status(200).send(challenge)
             } else {
                 // Responds with '403 Forbidden' if verify tokens do not match

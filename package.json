@@ -1,6 +1,7 @@
 {
-  "name": "whatsapp-channel-botpress",
-  "version": "1.0.0",
+  "name": "whatsapp-channel-for-botpress",
+  "fullName": "Whatsapp Channel for Botpress",
+  "version": "1.2.0",
   "main": "dist/backend/index.js",
   "description": "Whatsapp Channel for Botpress",
   "scripts": {

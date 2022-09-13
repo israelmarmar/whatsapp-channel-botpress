@@ -6,24 +6,28 @@ class WhatsAppMessagingClient {
     this.from = from;
   }
 
-  async sendMsg(msg, phone_number_id, from) {
-    try {
-      await axios.post(
-        "https://graph.facebook.com/v14.0/" + phone_number_id + "/messages",
-        { ...msg, to: from, messaging_product: "whatsapp" },
-        {
-          headers: {
-            Authorization: "Bearer " + process.env.WHATSAPP_API_TOKEN || "",
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } catch (e) {
-      console.log(JSON.stringify(e));
-    }
+  async sendMsg(msg, phone_number_id, from, botId) {
+      try {
+        if (process.env[`WHATSAPP_API_TOKEN_${botId.replace("-","_")}`])
+          await axios.post(
+            "https://graph.facebook.com/v14.0/" + phone_number_id + "/messages",
+            { ...msg, to: from, messaging_product: "whatsapp" },
+            {
+              headers: {
+                Authorization:
+                  "Bearer " + process.env[`WHATSAPP_API_TOKEN_${botId.replace("-","_")}`] ||
+                  "",
+                "Content-Type": "application/json",
+              },
+            }
+          );
+      } catch (e) {
+        console.log(JSON.stringify(e));
+      }
   }
 
   async sendMsgToUser(event) {
+    const botId = event.botId;
     const body = event.payload.text;
     switch (event.payload.type) {
       case "text":
@@ -32,7 +36,8 @@ class WhatsAppMessagingClient {
             text: { body },
           },
           this.phone_number_id || "",
-          this.from || ""
+          this.from || "",
+          botId || ""
         );
         break;
       case "single-choice":
@@ -46,7 +51,8 @@ class WhatsAppMessagingClient {
             },
           },
           this.phone_number_id || "",
-          this.from || ""
+          this.from || "",
+          botId || ""
         );
         break;
       default:
@@ -55,7 +61,8 @@ class WhatsAppMessagingClient {
             text: { body },
           },
           this.phone_number_id || "",
-          this.from || ""
+          this.from || "",
+          botId || ""
         );
     }
   }

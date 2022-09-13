@@ -1,4 +1,4 @@
-botpress = typeof botpress === "object" ? botpress : {}; botpress["whatsapp-channel-botpress"] =
+botpress = typeof botpress === "object" ? botpress : {}; botpress["whatsapp-channel-for-botpress"] =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
