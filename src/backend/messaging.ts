@@ -69,7 +69,7 @@ export default class WhatsAppMessagingServer {
       payload
     );
 
-    const { from, phone_number_id } = payload;
+    const { from, phone_number_id, name } = payload;
 
     const event = this.bp.IO.Event({
       messageId: message.id,
@@ -80,7 +80,8 @@ export default class WhatsAppMessagingServer {
       target: JSON.stringify({
         phone_number_id,
         from,
-        botId: this.botId
+        botId: this.botId,
+        name
       }),
       threadId: conversationId.toString(),
       type: payload.type,

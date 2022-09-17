@@ -6,7 +6,7 @@ export default async (bp: typeof sdk, botId: string) => {
   
   const msgClient = new WhatsAppMessaging(bp,botId)
 
-  const router = bp.http.createRouterForBot('whatsapp', {
+  const router = bp.http.createRouterForBot(`${botId}-whatsapp`, {
     checkAuthentication: false
   })
 
@@ -17,6 +17,8 @@ export default async (bp: typeof sdk, botId: string) => {
 
   router.post('/webhook', async (req: any, res: any) => {
     // info on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
+    bp.logger.info((JSON.stringify({botId, ...req.body})))
+    
     if (req.body.object) {
       if (
         req.body.entry &&
@@ -31,6 +33,7 @@ export default async (bp: typeof sdk, botId: string) => {
         let msg = req.body.entry[0].changes[0].value.messages[0]
         let timestamp = parseInt(req.body.entry[0].changes[0].value.messages[0].timestamp)
         let id = req.body.entry[0].changes[0].value.messages[0].id
+        let name = req.body.entry[0].changes[0].value.contacts[0].profile.name
 
         let msg_body;
         switch(msg.type){
@@ -46,7 +49,8 @@ export default async (bp: typeof sdk, botId: string) => {
           type: 'text',
           text: msg_body,
           from,
-          phone_number_id
+          phone_number_id,
+          name
         }
 
         // bp.events.replyToEvent(eventDestination, [payload])
@@ -72,7 +76,7 @@ export default async (bp: typeof sdk, botId: string) => {
   })
 
   router.get('/webhook', async (req: any, res: any) => {
-    const verify_token = process.env[`WHATSAPP_API_TOKEN_${botId.replace("-","_")}`] || ""
+    const verify_token = process.env[`WHATSAPP_API_VERIFY_TOKEN_${botId.replace("-","_")}`] || ""
 
     // Parse params from the webhook verification request
     let mode = req.query['hub.mode']
@@ -93,7 +97,7 @@ export default async (bp: typeof sdk, botId: string) => {
     })
 
   let apiUrl = await router.getPublicPath()
-  apiUrl = apiUrl.replace('BOT_ID', '___')
+  apiUrl = apiUrl.replace('BOT_ID', botId)
   bp.logger.info(`Private API Path is ${apiUrl}`)
 
 }

@@ -44,7 +44,7 @@ const entryPoint: sdk.ModuleEntryPoint = {
   skills,
   definition: {
     // This must match the name of your module's folder, and the name in package.json
-    name: 'whatsapp-channel-botpress',
+    name: 'whatsapp-channel-for-botpress',
     /**
      * By default we are using the https://blueprintjs.com/docs/#icons. Use the corresponding name
      * Otherwise, create an icon in the assets module in the following format studio_${module.menuIcon}
