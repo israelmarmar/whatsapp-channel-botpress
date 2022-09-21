@@ -67,6 +67,18 @@ class WDb {
       return undefined;
     }
   }
+
+  async delFile(file_uuid) {
+    try {
+      await this.knex("w_file_base64").where({ file_uuid }).del();
+    } catch (err) {
+      this.bp.logger.error(
+        "An error occurred while deleting a file mapping.",
+        err
+      );
+      return undefined;
+    }
+  }
 }
 
 module.exports = WDb;

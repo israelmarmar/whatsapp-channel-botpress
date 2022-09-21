@@ -10,7 +10,6 @@ const uploadImage = async () => {
         const db = new WDb(bp);
         const { fbimgid } = JSON.parse(event.payload.text);
         const { access_token, phone_number_id, api_url } = event.payload;
-        console.log("starting with image name"+args.name)
         const { data } = await axios.get('https://graph.facebook.com/v13.0/' + fbimgid, {
             headers: {
             Authorization:
@@ -18,11 +17,7 @@ const uploadImage = async () => {
             }       
         })
 
-        console.log({data})
-
         const { url } = data;
-
-        console.log("extracted url: "+url);
         
         const r = await axios.get(url, {
             responseType: 'arraybuffer',
@@ -38,7 +33,6 @@ const uploadImage = async () => {
         const user_wid = stringToUuid(phone_number_id);
         await db.createFile(file_uuid, file_base64, user_wid);
         user[`${args.name}_shortlink`] = api_url + '/file?file_uuid=' + file_uuid; 
-        console.log(user[`${args.name}_shortlink`])
     }catch(e){
         console.log(e);
         user[args.name] = 'invalid';

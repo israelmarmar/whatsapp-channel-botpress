@@ -54,7 +54,6 @@ export default class WhatsAppMessagingServer {
   }
 
   async sendMsgToBot(payload: any) {
-    console.log(JSON.stringify({payload}))
     const attr = await this.getUserAttributes();
     const user_map = await this.db.getUser(this.botId, this.userWId);
 
@@ -67,9 +66,7 @@ export default class WhatsAppMessagingServer {
     }
 
     if(!user_map){
-      console.log("this.userWId",this.userWId)
       const user_res = await this.db.createUserMapping(this.botId, this.userWId, this.userId)
-      console.log("user_res",user_res)
     }
 
     const conversationId = (await this.getRecent(this.userId)).id;

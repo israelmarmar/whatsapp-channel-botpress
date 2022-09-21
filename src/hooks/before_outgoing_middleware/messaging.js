@@ -22,7 +22,7 @@ class WhatsAppMessagingClient {
             }
           );
       } catch (e) {
-        console.log(JSON.stringify(e));
+        console.log(e);
       }
   }
 

@@ -26,6 +26,7 @@ export default async (bp: typeof sdk, botId: string, db: WDb) => {
       file_uuid = file_uuid.replace("-","");
       res.setHeader('Content-Disposition', `attachment;filename="${file_uuid}.jpg"`);
       res.setHeader('Content-Type', 'image/jpg');
+      await db.delFile(file_uuid);
       res.send(buffer);
     } catch (e) {
       console.log(e);
@@ -35,7 +36,6 @@ export default async (bp: typeof sdk, botId: string, db: WDb) => {
 
   router.post("/webhook", async (req: any, res: any) => {
     // info on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
-    bp.logger.info(JSON.stringify({ botId, ...req.body }));
 
     if (req.body.object) {
       if (
