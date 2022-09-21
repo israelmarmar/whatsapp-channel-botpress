@@ -55,6 +55,19 @@ class WhatsAppMessagingClient {
           botId || ""
         );
         break;
+      case "image":
+        this.sendMsg(
+          {
+            type: "image",
+            image: {
+              link: event.payload.image
+            }
+          },
+          this.phone_number_id || "",
+          this.from || "",
+          botId || ""
+        );
+        break;
       default:
         this.sendMsg(
           {

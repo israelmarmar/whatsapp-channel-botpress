@@ -1,9 +1,14 @@
 import * as sdk from 'botpress/sdk'
-
+import WDb from './db'
 import api from './api'
 
+let db: WDb
+
 // This is called when server is started, usually to set up the database
-const onServerStarted = async (bp: typeof sdk) => {}
+const onServerStarted = async (bp: typeof sdk) => {
+  db = new WDb(bp)
+  await db.initialize()
+}
 
 // At this point, you would likely setup the API route of your module.
 const onServerReady = async (bp: typeof sdk) => {
@@ -12,7 +17,7 @@ const onServerReady = async (bp: typeof sdk) => {
 
 // Every time a bot is created (or enabled), this method will be called with the bot id
 const onBotMount = async (bp: typeof sdk, botId: string) => {
-    await api(bp,botId)
+    await api(bp,botId,db)
 }
 
 // This is called every time a bot is deleted (or disabled)
